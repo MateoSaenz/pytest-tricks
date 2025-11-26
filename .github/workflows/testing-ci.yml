@@ -1,4 +1,4 @@
-name: Python application test with Github Actions
+name: test Python package versions
 
 on: [push]
 
@@ -6,22 +6,31 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
 
     steps:
-    - uses: actions/checkout@v2
-    - name: Set up Python 3.12.12
-      uses: actions/setup-python@v1
-      with:
-        python-version: 3.12.12
-    - name: Install dependencies
-      run: |
-        make install
-    - name: Lint with pylint
-      run: |
-        make lint
-    - name: Test with pytest
-      run: |
-        make test
-    - name: Format code
-      run: |
-        make format
+      - uses: actions/checkout@v5
+      - name: Setup Python # Set Python version
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      # Install pip and pytest
+      - name: Install dependencies
+        run: |
+          make install
+      
+      # Lint the code
+      - name: Lint with pylint
+        run: |
+          make lint
+
+      # test the code
+      - name: Test with pytest
+        run: |
+          make test
+      
+      - name: Format code with black
+        run: |
+          make format
